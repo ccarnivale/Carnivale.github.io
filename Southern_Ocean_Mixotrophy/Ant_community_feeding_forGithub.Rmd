@@ -52,7 +52,7 @@ The world's oceans are critical to the control of atmospheric CO~2~ and the Eart
 In this study, the occurrence of phototrophic, heterotrophic, and mixotrophic nanoflagellates and their respective influence (or impact) throughout the WAP region were examined. The abundances and activity (bacterivory and/or primary production) of each functional group were quantified at multiple depths along the latitudinal gradient of the WAP region during the austral spring (October – December). Microscope epifluorescence was used for abundance enumeration and bacterivorous feeding estimation. We employed a novel approach for estimating mixotrophic plankton primary production utilizing percentage of RNA reads per functional group to partition the primary production estimates and applied it to the bacterivorous dataset. During the austral spring in the WAP region, we hypothesized that 1) the mixotrophic portion of the community would be the dominant grazer, while acting as an auxiliary source of primary production relative to strict phototrophs; 2) MNANs abundance and activity would increase along the latitudinal and depth gradients; 3) MNANs would attain more of their carbon budget from bacterivory than primary production.
 
 ## Methods
-**NOTE: The bulk of the methods will be summarised in more detail in the proper manuscript as that is not the main focus of this document. Please see *future* DOI link for more detailed methods.**
+**NOTE: Detailed methods are in the manuscript. Please see *future* DOI link for more detailed methods.**
 
 To detect patterns that described the differences between sampled stations we performed a principal component analysis (PCA) of the environmental data. All environmental data was centered and scaled.
 	To assess the functional, or trophic abundance patterns we conducted PCA analyses to assess the similarities between samples implemented in R (R team citation). We used a similar approach to elucidate patterns emerging from measures of protistan activity (bacterial ingestion and primary production). Envfit was then used to relate the axes of our ordination to environmental variables. To verify groups identified in our ordinations of activity and abundance, PERMANOVA was used and implemented in R with the vegan package and the dataset was permuted 999 times (1000 total datasets), and the best model was selected based on the lowest calculated correct Akaike information criterion (AIC).
@@ -75,21 +75,22 @@ Response Variables calculated:
 #### Univariate exploratory visualizations
 
 #### First attempt at Multivariate analysis
-For Principal Component Analysis in R the data needs to be split with the response variables and the explanatory (feature) vars need to be separated into different objects or dataframes. I initially used the `rda()` from the package `vegan`, however, I later switch to the base `prcomp` as that output is more consistent without backdoor scaling not seen or controlable.
+For Principal Component Analysis in R the data needs to be split with the response variables and the explanatory (feature) vars need to be separated into different objects or dataframes. I initially used the *rda()* from the package *vegan*, however, I later switch to the base *prcomp* as that output is more consistent without backdoor scaling not seen or controlable.
 
 #### Data tidying and calculation
 
 
-```{r Final data read in, results='hide'}
+```{r Complete dataset read in, results='hide'}
 #Old Groups can replace with next line at any time
 #ant_community_final <- read.csv("/Users/christophercarnivale/Desktop/Dissertation_data/Antarctica_community_data/NBP1910_envdata_forFEED_final.csv")
 
 #New Groups
 ant_community_final <- read.csv("/Users/christophercarnivale/Desktop/Dissertation_data/Antarctica_community_data/NBP1910_envdata_forFEED_final_newgroup.csv")
 
-
+#Ensuring data properly imported
 str(ant_community_final)
 
+#Fixed data structure issues. Converting character to factors for categorical variables.
 ant_community_final$Rep <- as.factor(ant_community$Rep)
 ant_community_final$station <- as.factor(ant_community$station)
 ant_community_final$depth <- factor(ant_community$depth, levels = c("Surf", "DCM", "Bucket"))
@@ -99,7 +100,7 @@ ant_community_final$Group <- factor(ant_community_final$Group, levels = c("Gerla
 
 All of the calculations that follow will be done on a per mL basis.
 
-```{r Calculations on a per mL basis}
+```{r Initial calculations standardized to per mL}
 ant_community_final <- filter(ant_community_final, !(Rep == "C" & station == "A" & depth == "DCM"))
 
 ant_community_final_calc <- dplyr::mutate(ant_community_final,
