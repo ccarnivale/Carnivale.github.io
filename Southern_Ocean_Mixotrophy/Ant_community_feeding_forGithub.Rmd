@@ -1,7 +1,7 @@
 ---
 title: "Antarctic_community_feeding_diversity"
-author: "Chris Carnivale"
-date: "Initial version: 4/16/2021 Current version: `r format(Sys.Date(), '%d %Y')`"
+author: "Dr. Chris Carnivale Ph.D."
+date: "Initial version: 4/16/2021 Current version: `r format(Sys.Date(), '%m %d %Y')`"
 output: 
   html_document:
     toc: true
@@ -10,10 +10,11 @@ output:
 bibliography: Antarctic_manuscript_citations_fixed.bib
 link-citations: true
 ---
-# Purpose of this Document
-This document is meant to include the entire evolution of the project so initial coding snippets and attempts to estimate PP and other analyses are included even though I know typically older versions of code gets removed or depricated. **All of the initial attempts were removed from this version of the script but are present in the full form of this document in the github repo.**
+# Statement of Purpose
 
-# Manuscript in prep: Bacterivory and production of nanoflagellates off of the Western Antarctic Peninsula with a focus on mixotrophy
+This page is to showcase the work of the NBP2019 research voyage. Only important code and conclusions are to be presented here. All prior iterations and the process by which I get to the final version of the manuscript are present in the [Github Repository](https://github.com/ccarnivale/Antarctic_mixotrophy).
+
+# Manuscript in prep: Bacterivory and Production of Nanoflagellates Off of the Western Antarctic Peninsula with a Focus on Mixotrophy
 
 ## Abstract and Study Goals
 ### Goals 
@@ -22,7 +23,7 @@ This document is meant to include the entire evolution of the project so initial
 3. Introduce and assess the performance of a novel approach for estimating primary production originating from mixotrophic protists.
 4. Estimated the percentage of carbon incorporated my mixotrophic protists via autotrophic or heterotrophic mechanisms.
 
-### Bulleted Abstract/Summary
+### Abstract/Summary
 1. MNANs were detected at every station sampled and contributed significantly to the nanoflagellate community bacterivory and primary production.
 2. The mixotrophic community was mostly phototrophic when not taking "photosynthetic efficiency" into account. When utilizing the strongest penalty based on laboratory research on a primarily bacterivorous MNAN to the whole community, MNANs still on average got approximately a 50/50 split of their carbon from either PP and bacterivory.
 3. Strong latitudinal gradient exhibited via environmental variables and response metrics but not on percent of carbon aquisition.
@@ -30,6 +31,7 @@ This document is meant to include the entire evolution of the project so initial
 
 
 ```{r setup, include=FALSE}
+# Packages used in this project
 library(tidyverse)
 library(ggpubr)
 library(lme4)
@@ -52,17 +54,17 @@ The world's oceans are critical to the control of atmospheric CO~2~ and the Eart
 In this study, the occurrence of phototrophic, heterotrophic, and mixotrophic nanoflagellates and their respective influence (or impact) throughout the WAP region were examined. The abundances and activity (bacterivory and/or primary production) of each functional group were quantified at multiple depths along the latitudinal gradient of the WAP region during the austral spring (October – December). Microscope epifluorescence was used for abundance enumeration and bacterivorous feeding estimation. We employed a novel approach for estimating mixotrophic plankton primary production utilizing percentage of RNA reads per functional group to partition the primary production estimates and applied it to the bacterivorous dataset. During the austral spring in the WAP region, we hypothesized that 1) the mixotrophic portion of the community would be the dominant grazer, while acting as an auxiliary source of primary production relative to strict phototrophs; 2) MNANs abundance and activity would increase along the latitudinal and depth gradients; 3) MNANs would attain more of their carbon budget from bacterivory than primary production.
 
 ## Methods
-**NOTE: Detailed methods are in the manuscript. Please see *future* DOI link for more detailed methods.**
+**NOTE: See published dissertation/manuscript for more details.**
 
 To detect patterns that described the differences between sampled stations we performed a principal component analysis (PCA) of the environmental data. All environmental data was centered and scaled.
 	To assess the functional, or trophic abundance patterns we conducted PCA analyses to assess the similarities between samples implemented in R (R team citation). We used a similar approach to elucidate patterns emerging from measures of protistan activity (bacterial ingestion and primary production). Envfit was then used to relate the axes of our ordination to environmental variables. To verify groups identified in our ordinations of activity and abundance, PERMANOVA was used and implemented in R with the vegan package and the dataset was permuted 999 times (1000 total datasets), and the best model was selected based on the lowest calculated correct Akaike information criterion (AIC).
 	To assess the validity of the indirect molecular estimation method, the Kolmogorov-Smirnov test was used against the indirect and direct measurements for both MNAN and HNAN estimates for bacterivorous activity. Raw values were used to assess the impacts of scale and normalized values were used to test if they were from the same distribution.
 
-## Statistical Analysis Start
+## Exploratory Data Analysis (EDA)
 
-### Reading in and cleaning the data
+### Data Setup and Tidying
 
-Response Variables calculated:
+Initial Response Variables calculated:
 * MNAN/HNAN/PNAN/bacterial abundance
 * MNAN/HNAN feeding as:
   + Amount of bacterial consumed per organisms per hour
@@ -71,14 +73,10 @@ Response Variables calculated:
     + Per day
 * MNAN/HNAN percentage of total nanoflagellate feeding
 
-### Initial visualizations
-#### Univariate exploratory visualizations
+### Initial Exploratory Visualizations
+#### Univariate Exploratory Visualizations
 
-#### First attempt at Multivariate analysis
-For Principal Component Analysis in R the data needs to be split with the response variables and the explanatory (feature) vars need to be separated into different objects or dataframes. I initially used the *rda()* from the package *vegan*, however, I later switch to the base *prcomp* as that output is more consistent without backdoor scaling not seen or controlable.
-
-#### Data tidying and calculation
-
+#### Data Tidying and Calculation
 
 ```{r Complete dataset read in, results='hide'}
 #Old Groups can replace with next line at any time
@@ -91,14 +89,14 @@ ant_community_final <- read.csv("/Users/christophercarnivale/Desktop/Dissertatio
 str(ant_community_final)
 
 #Fixed data structure issues. Converting character to factors for categorical variables.
-ant_community_final$Rep <- as.factor(ant_community$Rep)
-ant_community_final$station <- as.factor(ant_community$station)
-ant_community_final$depth <- factor(ant_community$depth, levels = c("Surf", "DCM", "Bucket"))
+ant_community_final$Rep <- as.factor(ant_community_final$Rep)
+ant_community_final$station <- as.factor(ant_community_final$station)
+ant_community_final$depth <- factor(ant_community_final$depth, levels = c("Surf", "DCM", "Bucket"))
 ant_community_final$Group <- factor(ant_community_final$Group, levels = c("Gerlache", "Palmer", "Grandidier","Offshore","Maguerite"))
 
 ```
 
-All of the calculations that follow will be done on a per mL basis.
+*All of the calculations that follow will be done on a* ***per mL basis.***
 
 ```{r Initial calculations standardized to per mL}
 ant_community_final <- filter(ant_community_final, !(Rep == "C" & station == "A" & depth == "DCM"))
@@ -249,6 +247,9 @@ library(flextable)
 mixo_percent_df1 <- as.data.frame(mixo_percent_df)
 flextable(mixo_percent_df1)
 ```
+
+#### First attempt at Multivariate analysis
+For Principal Component Analysis in R the data needs to be split with the response variables and the explanatory (feature) vars need to be separated into different objects or dataframes. I initially used the *rda()* from the package *vegan*, however, I later switch to the base *prcomp* as that output is more consistent without backdoor scaling not seen or controlable.
 
 ```{r Final dataset PCA analysis ALL Reps}
 #need to add rownames for the PCA analysis to run
@@ -943,7 +944,7 @@ ant_community_final_functional_grp_fixed_remST_hetero_MoSelALL <- AICc.table.all
 
 ```
 
-```{r PCA Analysis of just Env Variables}
+```{r PCA Analysis of Environmental Variables}
 ant_community_final_calc_env_grp_remST_remREDUND_forpca <- ant_community_final_calc_env_grp_remST_remREDUND[,c(4:6,8:13,18:24)]
 #need to add rownames real quick first to make labelling easier
 rownames(ant_community_final_calc_env_grp_remST_remREDUND_forpca) <- grouped_rownames_remST
@@ -1115,9 +1116,9 @@ ggsave("env_to_env_correlationmatrix_remREDUND.pdf", plot = env_to_env_correlati
 **NEED TO ADD bactml or bprod to plot**
 
 # Summary of correlation table:
--u_sphere per ml had no correlation with any measured response variables.
+-microsphere per ml had no correlation with any measured response variables.
 -Increases in mixo activity and abundance correlate with positively with HNAN activity but not abundance.
--Mixo abundance and activity are the only responses not correlated with mixing depth
+-Mixotrophic abundance and activity are the only responses not correlated with mixing depth
 -Total DIN correlated with mixo activity on top of ANAN/PNAN/MNAN abundance
 -ONLY HNAN abundance was not correlated with time - same thing for latitude (need to account for this or explain it while writing the paper)
 -Salinity impacts PNAN/ANAN abund and HNAN activity
@@ -1131,12 +1132,12 @@ ggsave("env_to_env_correlationmatrix_remREDUND.pdf", plot = env_to_env_correlati
 -bprod correlates with HNAN activity
 -Ice correlates with everything NOT Mixo related
 
-BACTERIA production
+Bacterial Production
 -correlated with ice/NO2_NO3/PO4/mixing depth/O2/longitude/latitude/flourescence/beamtrans/
 conductivity/
 -bacteria is the only one correlated to PO4
 
-# Initial Interpretation of correlation table
+# Initial Interpretation of Correlation Table
 Bacteria:
 Reduced Ice cover increases bacterial production
 
@@ -1230,7 +1231,7 @@ adonis2(ant_community_final_functional_PP_remSites[,c(1,3)] ~ Pprod_PAR_20, data
 ```
 
 # PP Notes
-When doing the PP analysis I noticed some incongruencies. Mostly THERE ARE NO PP suface measurements for our size fraction.................................................................................
+When doing the PP analysis I noticed some incongruencies. Mostly THERE ARE NO PP suface measurements for our size fraction...
 
 After some discussion with JD, I'm going to use PAR_20 measured for all stations and look at PP analysis with that data, ignoring SUN measurements. Also, WHY were PAR and SUN measured for both surface and DCM samples....2x as much work for no reason. 
 
@@ -1299,8 +1300,8 @@ ggplot(PP_data_frame1)+
 ```
 
 ```{r Analyzing LTER datasets}
-chlA_cruise <- read.csv("LTER_PP_data/Chlorophyll_Cruise.csv")
-C_fixed_cruise <- read.csv("LTER_PP_data/Primary Production_Cruise.csv")
+chlA_cruise <- read.csv("/Users/christophercarnivale/Desktop/Dissertation_data/Antarctica_community_data/LTER_PP_data/Chlorophyll_Cruise.csv")
+C_fixed_cruise <- read.csv("/Users/christophercarnivale/Desktop/Dissertation_data/Antarctica_community_data/LTER_PP_data/Primary Production_Cruise.csv")
 
 str(chlA_cruise)
 str(C_fixed_cruise)
