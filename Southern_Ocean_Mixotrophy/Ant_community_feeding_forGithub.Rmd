@@ -1,7 +1,7 @@
 ---
 title: "Antarctic_community_feeding_diversity"
 author: "Dr. Chris Carnivale Ph.D."
-date: "Initial version: 4/16/2021 Current version: `r format(Sys.Date(), '%m %d %Y')`"
+date: "Initial Version: 4/16/2021 Current Version: `r format(Sys.Date(), '%m %d %Y')`"
 output: 
   html_document:
     toc: true
@@ -14,7 +14,7 @@ link-citations: true
 
 This page is to showcase the work of the NBP2019 research voyage. Only important code and conclusions are to be presented here. All prior iterations and the process by which I get to the final version of the manuscript are present in the [Github Repository](https://github.com/ccarnivale/Antarctic_mixotrophy).
 
-# Manuscript in prep: Bacterivory and Production of Nanoflagellates Off of the Western Antarctic Peninsula with a Focus on Mixotrophy
+## Manuscript in prep: Bacterivory and Production of Nanoflagellates Off of the Western Antarctic Peninsula with a Focus on Mixotrophy
 
 ## Abstract and Study Goals
 ### Goals 
@@ -80,15 +80,21 @@ Initial Response Variables calculated:
 
 ```{r Complete dataset read in, results='hide'}
 #Old Groups can replace with next line at any time
+# 2 Grouping methods were attempted
+# THe first being groups identified within the Grattenpanche et al. 2022 paper
+# Second using groups identified within this dataset which is clarified later in the document
+
+# Grattepanche (2022) grouping
 #ant_community_final <- read.csv("/Users/christophercarnivale/Desktop/Dissertation_data/Antarctica_community_data/NBP1910_envdata_forFEED_final.csv")
 
-#New Groups
+# Grouping using this dataset
 ant_community_final <- read.csv("/Users/christophercarnivale/Desktop/Dissertation_data/Antarctica_community_data/NBP1910_envdata_forFEED_final_newgroup.csv")
 
-#Ensuring data properly imported
+# Investigating the data structure once read in
 str(ant_community_final)
 
-#Fixed data structure issues. Converting character to factors for categorical variables.
+# Need to convert character columns into workable factors for analyses
+# Fixed data structure issues. Converting character to factors for categorical variables.
 ant_community_final$Rep <- as.factor(ant_community_final$Rep)
 ant_community_final$station <- as.factor(ant_community_final$station)
 ant_community_final$depth <- factor(ant_community_final$depth, levels = c("Surf", "DCM", "Bucket"))
@@ -99,6 +105,7 @@ ant_community_final$Group <- factor(ant_community_final$Group, levels = c("Gerla
 *All of the calculations that follow will be done on a* ***per mL basis.***
 
 ```{r Initial calculations standardized to per mL}
+# From initial data collection, additional features need to be calculated for analysis.
 ant_community_final <- filter(ant_community_final, !(Rep == "C" & station == "A" & depth == "DCM"))
 
 ant_community_final_calc <- dplyr::mutate(ant_community_final,
