@@ -1,0 +1,127 @@
+---
+title: "index"
+author: "Dr. Chris Carnivale Ph.D."
+date: "Initial version: 10/15/2024 Current Version: `r format(Sys.Date(), '%m %d %Y')`"
+output: 
+  html_document:
+      toc: true
+      toc_depth: 6
+      number_sections: true
+bibliography: Antarctic_manuscript_citations_fixed.bib
+link-citations: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(magrittr)
+library(tidyverse)
+library(ggeffects)
+library(gridExtra)
+library(grid)
+library(vegan)
+library(ggpubr)
+library(lme4)
+library(ggrepel)
+library(reshape)
+```
+
+# Statement of Purpose
+
+This page is to showcase the work of the NBP2019 and NBP2205 research voyages. Only important code and conclusions are to be presented here. All prior iterations and the process by which I get to the final version of the manuscript are present in the [Github Repository](https://github.com/ccarnivale/Antarctic_microplastic_identification_analysis).
+
+## Manuscript in prep: Microplastic Distribution within the Southern Ocean Water Column along Bathymetrical and Temporal Gradients
+
+## Abstract and Study Goals
+### Goals 
+1. Assess the distribution of microplastic pollution (plastic particles <5 mm) along the bathymetrical and temporal gradients throughout the Paradise Bay water column.
+2. Assess the distribution of microplastics across several size fractions: 0.22 µm - 20 µm, 20 µm - 100 µm, > 100 µm.
+3. Investigate the abiotic or biotic factors that influence microplastic distribution witin the Southern Ocean.
+
+### Bulleted Abstract
+1. Presence of microplastics were observed at each depth analyzed regardless of year or season. 
+2. There are orders of magitude differences in the estimated microplastic pollution between size fractions with the smallest size class (0.22 µm - 20 µm) consistenting of 99% of the estimated pollution.
+3. Only 5 different polymer types were identified within the Paradise Bay region of the Southern Ocean.
+4. Size fraction was the strongest driver of microplastic community composition and overall abundance.
+
+## Introduction 
+Accumulation has resulted in plastics becoming the most common form of marine debris, with an estimated 60%-80% of all marine debris and over 90% of all floating debris [@Gordon2006]. In addition, signs of the accumulation can start to be seen in the geological record, known by some as the plasticene [@Haram2020; @Ilechukwu2023; Lewis2016; @Rangel-Buitrago2022; @Reed2015]. The Plasticene stands to prevail well beyond the cessation of plastic production because of their environmental persistence. Plastic persistence throughout the world's oceans is a result of larger-sized plastics continuously degrading into smaller and smaller fragments via biodegradation, mechanical action, and photooxidation (secondary microplastics) [@Andrady2011; @Gewert2015]. Although microplastic distribution is considered ubiquitous, it is not homogenous with pattern related to marine current and bathymetry. High concentrations have been reported at the surface in central areas of the North Atlantic and Pacific oceans [@Eriksen2013; @Goldstein2012; @Law2010]. Current ocean circulation models suggest five possible accumulation areas in all five subtropical gyres, but they do not consider the Southern Ocean [@Lebreton2012; @Maximenko2012]. In addition to regional differences by current, there is a growing body of research, suggesting heterogeneous distribution of microplastics along a bathymetrical gradient [@Choy2019; @Enders2015; @Reisser2015; @Rowlands2023]. Recent models project the greatest frequency of microplastics at the surface with the most substantial dip in microplastic concentration occurring over the first few meters [@Enders2015; @Reisser2015]. Rowlands et al. (2023), showed varying degrees of microplastic flux throughout the depth profile of the water column. This included variation across sizes, with the largest flux within the smallest size fraction [@Rowlands2023]. 
+ 
+This work aims to aid in the understanding of the microplastic vertical distribution across temporal and bathymetrical gradients. Seawater was sampled from the same location within the Western Antarctic Peninsula (WAP) during two different years and seasons (late spring 2019 and winter 2022) throughout the water column. Microplastics were collect through serial filtration to evaluate different size ranges of microplastic contamination including small-microplastics (0.22 – 20 µm; S-MP), medium-microplastic (20 µm – 100 µm; M-MP), and large-microplastics (>100 µm; L-MP). Determining the seasonal and environmental influence on the distribution of microplastics is critical in determining the bioavailability to local biota and pervasiveness of microplastic pollution within the Southern Ocean (Andrady, 2022; Galloway et al., 2017). This work can provide an empirical dataset to better inform prediction models of oceanic microplastic distribution within polar waters, which can help inform more effective microplastic pollution policy and conservation strategies.
+
+
+## Methods
+**NOTE: See published dissertation/manuscript for more details.**
+
+To detect patterns that described the differences between sampled stations we performed a principal component analysis (PCA) of the environmental data. All environmental data was centered and scaled.
+	To assess the functional, or trophic abundance patterns we conducted PCA analyses to assess the similarities between samples implemented in R (R team citation). To maximize efficiency, some plots were altered using Adobe Illustrator (manuscript Figure 2) and all final manuscript tables were created in Excel using values calculated in R. We used a similar approach to elucidate patterns emerging from measures of protistan activity (bacterial ingestion and primary production). Envfit was then used to relate the axes of our ordination to environmental variables. To verify groups identified in our ordinations of activity and abundance, PERMANOVA was used and implemented in R with the vegan package and the dataset was permuted 999 times (1000 total datasets), and the best model was selected based on the lowest calculated correct Akaike information criterion (AIC).
+	To assess the validity of the indirect molecular estimation method, the Kolmogorov-Smirnov test was used against the indirect and direct measurements for both MNAN and HNAN estimates for bacterivorous activity. Raw values were used to assess the impacts of scale and normalized values were used to test if they were from the same distribution.
+	
+```{r Data Import and Tidying}
+# where data are located within the local machine
+setwd("/Users/christophercarnivale/Desktop/Dissertation_data/Raman Spectral Data copy/")
+# set seed for reproducibility within the regression estimates.
+set.seed(444)
+
+plastic_df <- read.csv("Env_Data_CC_wPlastic_newCF_blankCor.csv", header = TRUE)
+
+
+
+plastic_df_calc <- mutate(plastic_df,
+                          ABS_L = ABS * Correction_factor/Volume_filt,
+                          PET_L = PET.1 * Correction_factor/Volume_filt,
+                          PE_L = PE * Correction_factor/Volume_filt,
+                          PP_L = PP * Correction_factor/Volume_filt,
+                          PA_L = PA * Correction_factor/Volume_filt,
+                          total_L = Total_plastic * Correction_factor/Volume_filt)
+
+
+plastic_df_calc$depth <- factor(plastic_df_calc$depth,
+                                levels =c ("Surface","14m","15m","23m","40m","70m","110m","120m","150m","205m","250m","Deep"))
+
+
+plastic_df_calc$Size_fraction <- factor(plastic_df_calc$Size_fraction,
+                                levels =c ("<20",">20",">100"))
+
+plastic_df_calc$station <- factor(plastic_df_calc$station,
+                                        levels =c ("R","PS15"))
+
+ggplot(plastic_df_calc)+
+  geom_col(aes(x = station, y = total_L, fill = station))
+
+
+ggplot(plastic_df_calc)+
+  geom_col(aes(x = depth_m, y = total_L, fill = station))
+
+plastic_df_calc_grp <- group_by(plastic_df_calc, station, depth)
+
+plastic_df_calc_grp_sum <- summarise(plastic_df_calc_grp,
+                                     ABS_sum = sum(ABS_L),
+                                     PET_sum = sum(PET_L),
+                                     PE_sum = sum(PE_L),
+                                     PP_sum = sum(PP_L),
+                                     PA_sum = sum(PA_L),
+                                     total_sum = sum(total_L))
+
+#I need to split this for ease of calculation
+plastic_df_calc_StnR <- dplyr::filter(plastic_df_calc, station == "R")
+
+#plastic_df_calc_StnR$depth <- factor(plastic_df_calc_StnR$depth,
+#                                     levels = c("Surface","14m","23m","70m","110m","Deep"))
+
+plastic_df_calc_StnPS15 <- dplyr::filter(plastic_df_calc, station == "PS15")
+
+#plastic_df_calc_StnPS15$depth <- factor(plastic_df_calc_StnPS15$depth,
+#                                     levels =c ("Surface","15m","40m","120m","150m","205m","250m","Deep"))
+
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
