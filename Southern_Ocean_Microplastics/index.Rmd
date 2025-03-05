@@ -47,15 +47,15 @@ This page is to showcase the work of the NBP2019 and NBP2205 research voyages. O
 ## Introduction 
 Accumulation has resulted in plastics becoming the most common form of marine debris, with an estimated 60%-80% of all marine debris and over 90% of all floating debris [@Gordon2006]. In addition, signs of the accumulation can start to be seen in the geological record, known by some as the plasticene [@Haram2020; @Ilechukwu2023; Lewis2016; @Rangel-Buitrago2022; @Reed2015]. The Plasticene stands to prevail well beyond the cessation of plastic production because of their environmental persistence. Plastic persistence throughout the world's oceans is a result of larger-sized plastics continuously degrading into smaller and smaller fragments via biodegradation, mechanical action, and photooxidation (secondary microplastics) [@Andrady2011; @Gewert2015]. Although microplastic distribution is considered ubiquitous, it is not homogenous with pattern related to marine current and bathymetry. High concentrations have been reported at the surface in central areas of the North Atlantic and Pacific oceans [@Eriksen2013; @Goldstein2012; @Law2010]. Current ocean circulation models suggest five possible accumulation areas in all five subtropical gyres, but they do not consider the Southern Ocean [@Lebreton2012; @Maximenko2012]. In addition to regional differences by current, there is a growing body of research, suggesting heterogeneous distribution of microplastics along a bathymetrical gradient [@Choy2019; @Enders2015; @Reisser2015; @Rowlands2023]. Recent models project the greatest frequency of microplastics at the surface with the most substantial dip in microplastic concentration occurring over the first few meters [@Enders2015; @Reisser2015]. Rowlands et al. (2023), showed varying degrees of microplastic flux throughout the depth profile of the water column. This included variation across sizes, with the largest flux within the smallest size fraction [@Rowlands2023]. 
  
-This work aims to aid in the understanding of the microplastic vertical distribution across temporal and bathymetrical gradients. Seawater was sampled from the same location within the Western Antarctic Peninsula (WAP) during two different years and seasons (late spring 2019 and winter 2022) throughout the water column. Microplastics were collect through serial filtration to evaluate different size ranges of microplastic contamination including small-microplastics (0.22 – 20 µm; S-MP), medium-microplastic (20 µm – 100 µm; M-MP), and large-microplastics (>100 µm; L-MP). Determining the seasonal and environmental influence on the distribution of microplastics is critical in determining the bioavailability to local biota and pervasiveness of microplastic pollution within the Southern Ocean (Andrady, 2022; Galloway et al., 2017). This work can provide an empirical dataset to better inform prediction models of oceanic microplastic distribution within polar waters, which can help inform more effective microplastic pollution policy and conservation strategies.
+This work aims to aid in the understanding of the microplastic distribution across temporal and bathymetrical gradients. Seawater was sampled from the same location within the Western Antarctic Peninsula (WAP) during two different years and seasons (late spring 2019 and winter 2022) throughout the water column. Microplastics were collect through serial filtration to evaluate different size ranges of microplastic contamination including small-microplastics (0.22 – 20 µm; S-MP), medium-microplastic (20 µm – 100 µm; M-MP), and large-microplastics (>100 µm; L-MP). Determining the seasonal and environmental influence on the distribution of microplastics is critical in determining the bioavailability to local biota and pervasiveness of microplastic pollution within the Southern Ocean [@Andrady2022; @Galloway]2017]. This work can provide an empirical dataset to better inform prediction models of oceanic microplastic distribution within polar waters, which can help inform more effective microplastic pollution policy and conservation strategies.
 
 
 ## Methods
 **NOTE: See published dissertation/manuscript for more details.**
 
 To detect patterns that described the differences between sampled stations we performed a principal component analysis (PCA) of the environmental data. All environmental data was centered and scaled.
-	To assess the functional, or trophic abundance patterns we conducted PCA analyses to assess the similarities between samples implemented in R (R team citation). To maximize efficiency, some plots were altered using Adobe Illustrator (manuscript Figure 2) and all final manuscript tables were created in Excel using values calculated in R. We used a similar approach to elucidate patterns emerging from measures of protistan activity (bacterial ingestion and primary production). Envfit was then used to relate the axes of our ordination to environmental variables. To verify groups identified in our ordinations of activity and abundance, PERMANOVA was used and implemented in R with the vegan package and the dataset was permuted 999 times (1000 total datasets), and the best model was selected based on the lowest calculated correct Akaike information criterion (AIC).
-	To assess the validity of the indirect molecular estimation method, the Kolmogorov-Smirnov test was used against the indirect and direct measurements for both MNAN and HNAN estimates for bacterivorous activity. Raw values were used to assess the impacts of scale and normalized values were used to test if they were from the same distribution.
+	To assess the polymer abundance patterns across size fractions we conducted nMDS analyses to assess the similarities between samples in R using the vegan package. Some final versions of plots were altered/merged using Adobe Illustrator (manuscript Figure 2) and all final manuscript tables were created in Excel using values calculated/tabulated in R. We used a similar approach to elucidate patterns emerging from the measures of protistan activity (bacterial ingestion and primary production). Envfit was then used to relate the axes of our ordination to environmental variables that influence them. To verify groups identified in our ordinations of activity and abundance, PERMANOVA was used and implemented in R with the vegan package and the dataset was permuted 999 times (1000 total datasets), and the best model was selected based on the lowest calculated correct Akaike information criterion (AIC).
+  Due to logistical contraints the depths sampled varied between seasons (n = 6 Late Spring, n = 8 Early Winter), and the S-MP only had 3 depths analyzed in the Late Spring and 4 depths analyzed in teh Early Winter.
 	
 ```{r Data Import and Tidying}
 # where data are located within the local machine
@@ -120,8 +120,258 @@ plastic_df_calc_StnPS15 <- dplyr::filter(plastic_df_calc, station == "PS15")
 
 You can also embed plots, for example:
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+```{r Initial EDA, echo=FALSE}
+#Set theme for publication and cleaner presentations
+theme_set(theme_bw())
+theme_update(element_line(linewidth = 0), panel.grid.major = element_blank())
+
+
+ggplot(plastic_df_calc_StnR)+
+  geom_col(aes(x = depth, y = total_L, fill = station))
+
+
+ggplot(plastic_df_calc_StnPS15)+
+  geom_col(aes(x = depth, y = total_L, fill = station))
+
+ggplot(plastic_df_calc)+
+  geom_col(aes(x = depth, y = total_L, fill = station), position = position_dodge())
+
+ggplot(plastic_df_calc)+
+  geom_col(aes(x = depth, y = PE_L, fill = station), position = position_dodge())
+
+ggplot(plastic_df_calc)+
+  geom_col(aes(x = depth, y = ABS_L, fill = station), position = position_dodge())
+
+ggplot(plastic_df_calc)+
+  geom_col(aes(x = depth, y = PET_L, fill = station), position = position_dodge())
+
+ggplot(plastic_df_calc)+
+  geom_col(aes(x = depth, y = PP_L, fill = station), position = position_dodge())
+
+ggplot(plastic_df_calc)+
+  geom_col(aes(x = depth, y = PA_L, fill = station), position = position_dodge())
+
+ggplot(plastic_df_calc)+
+  geom_col(aes(x = Size_fraction, y = total_L, fill = station), position = position_dodge())
+
+ggplot(plastic_df_calc)+
+  geom_col(aes(x = Size_fraction, y = PP_L, fill = station), position = position_dodge())
+
+ggplot(dplyr::filter(plastic_df_calc, Size_fraction == "<20"))+
+  geom_point(aes(x = CStarTr0, y = total_L, color = station))
+
+ggplot(dplyr::filter(plastic_df_calc, Size_fraction == "<20"))+
+  geom_point(aes(x = flECO.AFL, y = total_L, color = station))
+
+ggplot(dplyr::filter(plastic_df_calc, Size_fraction == "<20"))+
+  geom_point(aes(x = Density, y = total_L, color = station))
+
+ggplot(dplyr::filter(plastic_df_calc, Size_fraction == "<20"))+
+  geom_point(aes(x = sal00, y = total_L, color = station))
+
+ggplot(dplyr::filter(plastic_df_calc, Size_fraction == "<20"))+
+  geom_point(aes(x = depth_m, y = total_L, color = station))
+
+ggplot(plastic_df_calc)+
+  geom_point(aes(x = depth_m, y = total_L, color = station))
+
+ggplot(plastic_df_calc)+
+  geom_point(aes(x = flECO.AFL, y = total_L, color = station))
+
+ggplot(plastic_df_calc)+
+  geom_point(aes(x =  par, y = total_L, color = station))
+
+ggplot(plastic_df_calc)+
+  geom_col(aes(x = station, y = PE_L, fill = Size_fraction))
+
+ggplot(plastic_df_calc)+
+  geom_col(aes(x = station, y = ABS_L, fill = Size_fraction))
+
+ggplot(plastic_df_calc)+
+  geom_col(aes(x = station, y = PET_L, fill = Size_fraction))
+
+ggplot(plastic_df_calc)+
+  geom_col(aes(x = station, y = PP_L, fill = Size_fraction))
+
+ggplot(plastic_df_calc)+
+  geom_col(aes(x = station, y = PA_L, fill = Size_fraction))
+
+ggplot(plastic_df_calc)+
+  geom_col(aes(x = Size_fraction, y = PE_L))
+
+ggplot(plastic_df_calc)+
+  geom_col(aes(x = Size_fraction, y = ABS_L))
+
+ggplot(plastic_df_calc)+
+  geom_col(aes(x = Size_fraction, y = PET_L))
+
+ggplot(plastic_df_calc)+
+  geom_col(aes(x = Size_fraction, y = PP_L))
+
+ggplot(plastic_df_calc)+
+  geom_col(aes(x = Size_fraction, y = PA_L))
+
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+###EDA Notes 
+####Total plastics
+There is are a lot of 0s in this dataset, especially in the year 2022. There are very few estimated plastics estimated by either of the larger size fractions There is an order of magnitude difference as we move from largest to smallest size Almost all of the estimated plastics come in the smallest size fraction (~99%).
+Stn_R has a nearly triple of the amount of plastic estimated...BUT this is not a proper water column integration. There is some signal (I haven't tested this yet) with a variety of different. Environmental variables such as:salinity, density, pressure, depth, size fraction, %transmission, flourescence.
+####Polymer specific notes
+All identified polymers occurs at both sampling periods. There are major differences between size fractions for each polymer and some but less important between stations
+ABS only occurs at the smallest size fraction. This is the only size specific polymer in the dataset. By concentration, ABS is the second largest in amount of microplastics. PE is the largest by total concentration and the majority of them is in the smallest size fraction.PP was the smallest of the 5 plastic polymers identified and was almost entirely absent from station R but quantified to be a few hundred per L. PET is the only polymer to show any real signal at the largest size fraction again largest amount in the S-MP size fraction. PA doesn't show anything different than previously mentioned. 
+
+I need to do composition plots with depth bar/frequency plots
+First I need to change from wide format to long format to properly address this. I accomplish this utilizing the melt function from the reshape package.
+
+```{r EDA long format}
+plastic_df_calc_forMELT <- plastic_df_calc[,c(1:3,32,41:45)]
+
+plastic_df_calc_melt <- melt(plastic_df_calc_forMELT, 
+                             id.vars = c("station","depth", "depth_m","Size_fraction"),
+                             measure.vars = c("ABS_L","PET_L","PE_L","PP_L","PA_L"))
+
+ggplot(plastic_df_calc_melt)+
+  geom_col(aes(x = Size_fraction, y = value, fill = variable))
+
+ggplot(plastic_df_calc_melt)+
+  geom_line(aes(x = depth_m, y = value, color = variable, linetype = station))+
+  coord_flip()+
+  scale_y_continuous(position = "right")+
+  scale_x_reverse()
+
+ggplot(plastic_df_calc_melt)+
+  geom_line(aes(x = depth_m, y = value, color = variable))+
+  coord_flip()+
+  scale_y_continuous(position = "right")+
+  scale_x_reverse()+facet_wrap(station~Size_fraction)
+
+```
+
+This approach works for lineplot but not for a stacked barplot...I need to fix the data structure to be able to visualize the data. I do this by calculating the proportions of each polymer and melting that into long format.
+
+```{r EDA long format continued}
+plastic_df_calc_forMELT_stacked <- plastic_df_calc[,c(1:3,32,41:46)] %>% 
+                              mutate(ABS_prop = ABS_L/total_L,
+                                     PET_prop = PET_L/total_L,
+                                     PE_prop = PE_L/total_L,
+                                     PP_prop = PP_L/total_L,
+                                     PA_prop = PA_L/total_L) %>% dplyr::filter(total_L != 0)
+
+plastic_df_calc_melt_stacked <- melt(plastic_df_calc_forMELT_stacked, 
+                             id.vars = c("station","depth", "depth_m","Size_fraction"),
+                             measure.vars = c("ABS_prop","PET_prop","PE_prop","PP_prop","PA_prop"))
+
+ggplot(plastic_df_calc_melt_stacked)+
+  geom_col(aes(x = Size_fraction, y = value, fill = variable))
+
+ggplot(plastic_df_calc_melt_stacked)+
+  geom_col(aes(x = depth, y = value, fill = variable))+facet_wrap(station~Size_fraction, nrow = 1)
+
+ggplot(plastic_df_calc_melt_stacked)+
+  geom_line(aes(x = depth_m, y = value, color = variable))+
+  coord_flip()+
+  scale_y_continuous(position = "right")+
+  scale_x_reverse()+facet_grid(cols = vars(Size_fraction))
+
+ggplot(plastic_df_calc_melt_stacked)+
+  geom_line(aes(x = depth_m, y = value, color = variable))+
+  coord_flip()+
+  scale_y_continuous(position = "right", label = c("0","0.25", "0.5", "0.75","1"))+
+  scale_x_reverse()+facet_grid(cols = vars(station))
+
+ggplot(plastic_df_calc_melt_stacked)+
+  geom_line(aes(x = depth_m, y = value, color = variable))+
+  coord_flip()+
+  scale_y_continuous(position = "right", label = c("0","0.25", "0.5", "0.75","1"))+
+  scale_x_reverse()+facet_wrap(station~Size_fraction)
+```
+
+###Some notes from additional visualizations:
+I don't like the line plots until I separate it into separate station or size. It's too busy and jumpy to make any obvious conclusions.
+
+When line plots are subdivided by station:
+
+## NMDS analyses
+**NOTE** I will only show the code for 1 visualization and show the results for all of the different subsets.
+
+```{r NMDS EDA}
+#Subset and transform the data into relative "abundances" for each of the plastic "species"
+
+#There are several site at which there are no plastics found at all. With these I need to remove the sites from all analyses. This limits my statistical power and causes sampling imbalances.
+
+#Transforming data set to filter out sites with total_L = 0
+
+plastic_df_calc_no0 <- dplyr::filter(plastic_df_calc, total_L != 0)
+
+group_by(plastic_df_calc_no0, Size_fraction) %>% summarise(counts = n())
+
+NMDS_df <- plastic_df_calc_no0[, 41:45]
+
+env_df <- plastic_df_calc_no0[, 1:32]
+
+NMDS_df_transformed <- decostand(NMDS_df, "hellinger")
+
+NMDS_df_transformed_distance <- vegdist(NMDS_df, "bray")
+
+all_NMDS <- metaMDS(NMDS_df_transformed)
+
+all_NMDS_untran <- metaMDS(NMDS_df)
+
+all_NMDS_fit <- envfit(all_NMDS ~ ., env_df, perm = 999)
+
+all_NMDS_fit_untran <- envfit(all_NMDS_untran ~ ., env_df, perm = 999)
+
+#Extracting scores for ggploting
+all_NMDS_scores <- as.data.frame(scores(all_NMDS, display = "sites"))
+all_NMDS_species <- as.data.frame(scores(all_NMDS, display = "species"))
+all_NMDS_scores$depth <- plastic_df_calc_no0$depth
+all_NMDS_scores$depth_m <- plastic_df_calc_no0$depth_m
+all_NMDS_scores$station <- plastic_df_calc_no0$station
+all_NMDS_scores$Size_fraction <- plastic_df_calc_no0$Size_fraction
+#scores of vectors from the envfit used to then plot on top of original PCAs they were fit to
+all_NMDS_fit_scores_vectors <- as.data.frame(scores(all_NMDS_fit, "vectors"))
+
+all_NMDS_fit_scores_factors <- as.data.frame(scores(all_NMDS_fit, "factors"))
+
+ggplot(data = all_NMDS_scores, aes(x = NMDS1, y = NMDS2))+
+  geom_point(aes(color = depth))
+
+ggplot(data = all_NMDS_scores, aes(x = NMDS1, y = NMDS2))+
+  geom_point(aes(color = station))
+
+ggplot(data = all_NMDS_scores, aes(x = NMDS1, y = NMDS2))+
+  geom_point(aes(color = depth_m, shape = Size_fraction))
+
+ggplot(data = all_NMDS_scores, aes(x = NMDS1, y = NMDS2))+
+  geom_point(aes(size = Size_fraction, shape = station, color = depth_m))+
+  #geom_segment(data = all_NMDS_fit_scores_vectors[c(3,5,19,20,23),], aes(x = 0, y = 0, xend = all_NMDS_fit_scores_vectors[c(3,5,19,20,23),1], yend = all_NMDS_fit_scores_vectors[c(3,5,19,20,23),2]))+
+  #geom_text_repel(data = all_NMDS_fit_scores_vectors[c(3,5,19,20,23),], aes(x = all_NMDS_fit_scores_vectors[c(3,5,19,20,23),1], y = all_NMDS_fit_scores_vectors[c(3,5,19,20,23),2]-0.04), fontface = "bold", label = rownames(all_NMDS_fit_scores_vectors[c(3,5,19,20,23),]))+
+  geom_segment(data = all_NMDS_fit_scores_factors[c(12:14),], aes(x = 0, y = 0, xend = all_NMDS_fit_scores_factors[c(12:14),1], yend = all_NMDS_fit_scores_factors[c(12:14),2]))+
+  geom_text_repel(data = all_NMDS_fit_scores_factors[c(12:14),], aes(x = all_NMDS_fit_scores_factors[c(12:14),1], y = all_NMDS_fit_scores_factors[c(12:14),2]-0.04), fontface = "bold", label = rownames(all_NMDS_fit_scores_factors[c(12:14),]))+
+  geom_segment(data = all_NMDS_species, aes(x = 0, y = 0, xend = NMDS1, yend = NMDS2/2), color = "red")+
+  geom_text_repel(data = all_NMDS_species, aes(x = NMDS1, y = NMDS2/2), label = rownames(all_NMDS_species))#+
+#geom_text(size = 3,label = rownames(all_NMDS_scores))
+
+#I need to repeat with untransformed data to get and display the species scores
+#Extracting scores for ggploting
+all_NMDS_scores_untran <- as.data.frame(scores(all_NMDS_untran, display = "sites"))
+all_NMDS_species_untran <- as.data.frame(scores(all_NMDS_untran, display = "species"))
+all_NMDS_scores_untran$depth <- plastic_df_calc_no0$depth
+all_NMDS_scores_untran$depth_m <- plastic_df_calc_no0$depth_m
+all_NMDS_scores_untran$station <- plastic_df_calc_no0$station
+all_NMDS_scores_untran$Size_fraction <- plastic_df_calc_no0$Size_fraction
+
+all_NMDS_fit_scores_vectors_untran <- as.data.frame(scores(all_NMDS_fit_untran, "vectors"))
+
+all_NMDS_fit_scores_factors_untran <- as.data.frame(scores(all_NMDS_fit_untran, "factors"))
+
+ggplot(data = all_NMDS_scores_untran, aes(x = NMDS1, y = NMDS2))+
+  geom_point(aes(size = station, shape = Size_fraction, color = depth_m))+
+  geom_segment(data = all_NMDS_fit_scores_vectors[c(17,19,20),], aes(x = 0, y = 0, xend = all_NMDS_fit_scores_vectors[c(17,19,20),1], yend = all_NMDS_fit_scores_vectors[c(17,19,20),2]))+
+  geom_text_repel(data = all_NMDS_fit_scores_vectors[c(17,19,20),], aes(x = all_NMDS_fit_scores_vectors[c(17,19,20),1], y = all_NMDS_fit_scores_vectors[c(17,19,20),2]-0.04), fontface = "bold", label = rownames(all_NMDS_fit_scores_vectors[c(17,19,20),]))+
+  geom_segment(data = all_NMDS_species_untran, aes(x = 0, y = 0, xend = NMDS1, yend = NMDS2), color = "red")+
+  geom_text_repel(data = all_NMDS_species_untran, aes(x = NMDS1, y = NMDS2), label = rownames(all_NMDS_species_untran))#+
+  #geom_text(size = 3,label = rownames(all_NMDS_scores_untran))
+```
+
